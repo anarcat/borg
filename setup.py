@@ -126,6 +126,7 @@ with open('README.rst', 'r') as fd:
 # (function, predicate), see http://docs.python.org/2/distutils/apiref.html#distutils.cmd.Command.sub_commands
 # seems like this doesn't work on RTD, see below for build_py hack.
 build.sub_commands.append(('build_api', None))
+build.sub_commands.append(('build_manpage', None))
 build.sub_commands.append(('build_usage', None))
 
 
@@ -155,6 +156,7 @@ class build_py_custom(build_py):
 cmdclass = {
     'build_ext': build_ext,
     'build_api': borg.documentation.build_api,
+    'build_manpage': borg.documentation.build_manpage,
     'build_usage': borg.documentation.build_usage,
     'build_py': build_py_custom,
     'sdist': Sdist
