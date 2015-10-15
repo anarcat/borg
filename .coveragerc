@@ -1,5 +1,7 @@
 [run]
 branch = True
+parallel = true
+data_file = /tmp/coverage-data
 source = borg
 omit =
     borg/__init__.py
