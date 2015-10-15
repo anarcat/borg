@@ -549,8 +549,8 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
                     print(warning)
         return args
 
-    def build_parser(self, args=None, prog=None):
-        common_parser = argparse.ArgumentParser(add_help=False, prog=prog)
+    def build_parser(self, args=None, prog=None, formatter_class=argparse.RawDescriptionHelpFormatter):
+        common_parser = argparse.ArgumentParser(add_help=False, prog=prog, formatter_class=formatter_class)
         common_parser.add_argument('-v', '--verbose', dest='verbose', action='store_true',
                                    default=False,
                                    help='verbose output')
@@ -561,7 +561,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         common_parser.add_argument('--remote-path', dest='remote_path', default=RemoteRepository.remote_path, metavar='PATH',
                                    help='set remote path to executable (default: "%(default)s")')
 
-        parser = argparse.ArgumentParser(prog=prog, description='Borg %s - Deduplicated Backups' % __version__)
+        parser = argparse.ArgumentParser(prog=prog, description='Borg %s - Deduplicated Backups' % __version__, formatter_class=formatter_class)
         subparsers = parser.add_subparsers(title='Available commands')
 
         serve_epilog = textwrap.dedent("""
@@ -569,7 +569,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         """)
         subparser = subparsers.add_parser('serve', parents=[common_parser],
                                           description=self.do_serve.__doc__, epilog=serve_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_serve)
         subparser.add_argument('--restrict-to-path', dest='restrict_to_paths', action='append',
                                metavar='PATH', help='restrict repository access to PATH')
@@ -582,7 +582,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         """)
         subparser = subparsers.add_parser('init', parents=[common_parser],
                                           description=self.do_init.__doc__, epilog=init_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_init)
         subparser.add_argument('repository', metavar='REPOSITORY', nargs='?', default='',
                                type=location_validator(archive=False),
@@ -630,7 +630,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('check', parents=[common_parser],
                                           description=self.do_check.__doc__,
                                           epilog=check_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_check)
         subparser.add_argument('repository', metavar='REPOSITORY_OR_ARCHIVE', nargs='?', default='',
                                type=location_validator(),
@@ -655,7 +655,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('change-passphrase', parents=[common_parser],
                                           description=self.do_change_passphrase.__doc__,
                                           epilog=change_passphrase_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_change_passphrase)
         subparser.add_argument('repository', metavar='REPOSITORY', nargs='?', default='',
                                type=location_validator(archive=False))
@@ -671,7 +671,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('create', parents=[common_parser],
                                           description=self.do_create.__doc__,
                                           epilog=create_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_create)
         subparser.add_argument('-s', '--stats', dest='stats',
                                action='store_true', default=False,
@@ -738,7 +738,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('extract', parents=[common_parser],
                                           description=self.do_extract.__doc__,
                                           epilog=extract_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_extract)
         subparser.add_argument('-n', '--dry-run', dest='dry_run',
                                default=False, action='store_true',
@@ -773,7 +773,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('rename', parents=[common_parser],
                                           description=self.do_rename.__doc__,
                                           epilog=rename_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_rename)
         subparser.add_argument('archive', metavar='ARCHIVE',
                                type=location_validator(archive=True),
@@ -789,7 +789,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('delete', parents=[common_parser],
                                           description=self.do_delete.__doc__,
                                           epilog=delete_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_delete)
         subparser.add_argument('-s', '--stats', dest='stats',
                                action='store_true', default=False,
@@ -807,7 +807,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('list', parents=[common_parser],
                                           description=self.do_list.__doc__,
                                           epilog=list_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_list)
         subparser.add_argument('--short', dest='short',
                                action='store_true', default=False,
@@ -824,7 +824,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('mount', parents=[common_parser],
                                           description=self.do_mount.__doc__,
                                           epilog=mount_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_mount)
         subparser.add_argument('src', metavar='REPOSITORY_OR_ARCHIVE', type=location_validator(),
                                help='repository/archive to mount')
@@ -842,7 +842,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('info', parents=[common_parser],
                                           description=self.do_info.__doc__,
                                           epilog=info_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_info)
         subparser.add_argument('archive', metavar='ARCHIVE',
                                type=location_validator(archive=True),
@@ -875,7 +875,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('prune', parents=[common_parser],
                                           description=self.do_prune.__doc__,
                                           epilog=prune_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_prune)
         subparser.add_argument('-n', '--dry-run', dest='dry_run',
                                default=False, action='store_true',
@@ -939,7 +939,7 @@ Type "Yes I am sure" if you understand this and want to continue.\n""")
         subparser = subparsers.add_parser('upgrade', parents=[common_parser],
                                           description=self.do_upgrade.__doc__,
                                           epilog=upgrade_epilog,
-                                          formatter_class=argparse.RawDescriptionHelpFormatter)
+                                          formatter_class=formatter_class)
         subparser.set_defaults(func=self.do_upgrade)
         subparser.add_argument('-n', '--dry-run', dest='dry_run',
                                default=False, action='store_true',

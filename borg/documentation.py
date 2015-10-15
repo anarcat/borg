@@ -5,6 +5,8 @@ from distutils.errors import DistutilsOptionError
 import os
 import time
 
+import pdb
+
 class build_usage(Command):
     description = "generate usage for each command"
 
@@ -111,13 +113,13 @@ class build_manpage(Command):
             if class_name is not None:
                 cls = getattr(mod, class_name)
                 try:
-                    parser = getattr(cls, func_name)()
+                    parser = getattr(cls, func_name)(formatter_class=ManPageFormatter)
                 except TypeError:
                     # e.g. "TypeError: build_parser() missing 1 required positional argument: 'self'"
                     # that is, it's not class or static method, so instanciate an object
-                    parser = getattr(cls(), func_name)()
+                    parser = getattr(cls(), func_name)(formatter_class=ManPageFormatter)
             else:
-                parser = getattr(mod, func_name)()
+                parser = getattr(mod, func_name)(formatter_class=ManPageFormatter)
             parser.formatter = ManPageFormatter(scriptname)
             #parser.formatter.set_parser(parser)
             parser.prog = scriptname
@@ -138,17 +140,13 @@ class build_manpage(Command):
         else:
             name = self._markup(appname)
         ret.append('.SH NAME\n%s\n' % name)
-        # override argv, we need to format it later
-        prog_bak = parser.prog
-        parser.prog = ''
         epilog = parser.epilog
         parser.epilog = None
-        synopsis = parser.format_help().lstrip(' ')
+        pdb.set_trace()
+        synopsis = parser.format_usage().lstrip(' ')
         parser.epilog = epilog
-        parser.prog = prog_bak
         if synopsis:
-            ret.append('.SH SYNOPSIS\n.B %s\n%s\n' % (self._markup(appname),
-                                                      synopsis))
+            ret.append(synopsis)
         long_desc = parser.epilog
         if long_desc:
             ret.append('.SH DESCRIPTION\n%s\n' % self._markup("\n".join(long_desc.splitlines()[1:])))
@@ -156,7 +154,7 @@ class build_manpage(Command):
 
     def _write_options(self, parser):
         ret = ['.SH OPTIONS\n']
-        #ret.append(parser.format_option_help())
+        ret.append(parser.format_help())
         return ''.join(ret)
 
     def _write_footer(self, parser):
@@ -191,19 +189,27 @@ class build_manpage(Command):
             stream.close()
 
 
-class ManPageFormatter(argparse.HelpFormatter):
+class ManPageFormatter(argparse.RawTextHelpFormatter):
 
     def __init__(self, prog,
                  indent_increment=2,
                  max_help_position=24,
                  width=None):
-        argparse.HelpFormatter.__init__(self, prog,
+        super().__init__(prog,
                                         indent_increment=indent_increment,
                                         max_help_position=max_help_position,
                                         width=width)
+        if not prog:
+            print("oops?")
+            self._prog = 'borg'
+        else:
+            print("prog: %s" % self._prog)
 
     def _markup(self, txt):
         return txt.replace('-', '\\-')
+
+    def _format_usage(self, usage, actions, groups, prefix):
+        return super()._format_usage(usage, actions, groups, prefix='.SH SYNOPSIS\n')
 
     def format_usage(self, usage):
         return self._markup(usage)
