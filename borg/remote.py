@@ -13,6 +13,8 @@ from . import __version__
 
 from .helpers import Error, IntegrityError, sysinfo
 from .repository import Repository
+from .logger import create_logger
+logger = create_logger()
 
 import msgpack
 
@@ -161,7 +163,7 @@ class RemoteRepository:
         except ConnectionClosed:
             raise ConnectionClosedWithHint('Is borg working on the server?')
         if version != RPC_PROTOCOL_VERSION:
-            raise Exception('Server insisted on using unsupported protocol version %d' % version)
+            logger.warning('WARNING: Server insisted on using unsupported protocol version %d' % version)
         self.id = self.call('open', location.path, create, lock_wait, lock)
 
     def __del__(self):
